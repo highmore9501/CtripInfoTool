@@ -4,6 +4,7 @@ function extractTextLabels() {
     航班信息: [],
     景点信息: [],
     酒店信息: [],
+    用车信息: [],
   };
 
   function extractTextByTitle(title, trip_card_mod, date_info) {
@@ -51,6 +52,17 @@ function extractTextLabels() {
         内容: hotelName,
       };
       final_result["酒店信息"].push(hotel_details);
+    } else if (title == "用车") {
+      // 提取用车信息
+      const carInfo = trip_card_mod
+        .querySelector("p.city_name.open_time")
+        .textContent.trim();
+
+      const car_details = {
+        日期: date_info,
+        内容: carInfo,
+      };
+      final_result["用车信息"].push(car_details);
     }
 
     return null;
@@ -159,6 +171,13 @@ document.addEventListener("DOMContentLoaded", function () {
                   "+"
                 )}\n`;
               }
+            });
+            output += "\n";
+
+            // 处理用车信息
+            output += "用车信息 \n";
+            finalResult["用车信息"].forEach((car) => {
+              output += `${car.日期} ${car.内容}\n`;
             });
 
             // 复制到剪贴板
