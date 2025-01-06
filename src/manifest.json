@@ -11,7 +11,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://m.ctrip.com/webapp/vacations/dingzhi/journey*"],
       "js": ["content.js"]
     }
   ],
@@ -20,6 +20,7 @@
     "default_icon": "images/icon.png"
   },
   "icons": {
-    "48": "images/icon.png"
+    "48": "images/icon.png",
+    "50": "images/download-icon.png"
   }
 }
