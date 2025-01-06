@@ -165,13 +165,13 @@ document.addEventListener("DOMContentLoaded", function () {
             navigator.clipboard
               .writeText(output)
               .then(() => {
-                alert("文本内容已复制到剪贴板");
+                alert("行程信息已复制到剪贴板");
               })
               .catch((err) => {
                 alert("复制到剪贴板失败: " + err);
               });
           } else {
-            alert("未能提取文本内容。");
+            alert("未能提取行程信息。");
           }
         }
       );
