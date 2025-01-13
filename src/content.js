@@ -104,7 +104,17 @@ function extractTextLabels() {
       const flight_info = trip_card_mod
         .querySelector("div.flight_info")
         .textContent.trim();
-      const flight_number = flight_info.match(/([A-Z]{2}\d+)/)[0];
+      let flight_number_match = flight_info.match(/([A-Z]{2}\d+)/);
+
+      if (!flight_number_match || !flight_number_match[0]) {
+        // 如果默认匹配模式取不到结果，使用另一个匹配模式
+        flight_number_match = flight_info.match(/(\d+[A-Z]{1}\d+)/);
+      }
+
+      const flight_number =
+        flight_number_match && flight_number_match[0]
+          ? flight_number_match[0]
+          : "未知航班号";
 
       // 拼接最终结果
       const flight_details = {
