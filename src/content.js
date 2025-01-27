@@ -334,5 +334,63 @@ function fallbackCopyToClipboard(text) {
   document.body.removeChild(textArea);
 }
 
+function extract_guest_info() {
+  // 1. 在当前页面中寻找class为`ant-table-tbody`的所有div
+  const cardBodys = document.querySelectorAll("div.ant-card-body");
+  // 使用最后一个cardBody
+  const cardBody = cardBodys[cardBodys.length - 1];
+
+  if (!cardBody) {
+    console.error("未找到 class 为 'ant-card-body' 的div元素");
+    return;
+  }
+
+  const tableBody = cardBody.querySelector("tbody.ant-table-tbody");
+
+  if (!tableBody) {
+    console.error("未找到 class 为 'ant-table-tbody' 的td元素");
+    return;
+  }
+
+  // 2. 寻找表格下面所有的`tr`元素，也就是表格里的每一行
+  const rows = tableBody.querySelectorAll("tr");
+
+  const columnsToExtract = [1, 5, 13]; // 定义要提取的列的数组
+
+  // 3. 把每一行里的每一个`td`里的内容都提取出来，也就是表格里每个单元格的内容
+  const tableData = [];
+  rows.forEach((row) => {
+    const rowData = [];
+    const cells = row.querySelectorAll("td");
+    cells.forEach((cell, index) => {
+      if (columnsToExtract.includes(index)) {
+        let cellContent = cell.textContent.trim();
+        if (cellContent) {
+          // 如果是第13列，提取内容并用空格分割，取分割后的后面一个元素
+          if (index === 13) {
+            const parts = cellContent.split(" ");
+            cellContent = parts[parts.length - 1];
+          }
+          rowData.push(cellContent);
+        }
+      }
+    });
+    tableData.push(rowData);
+  });
+
+  console.log("提取的表格数据：", tableData);
+
+  let output = "";
+  tableData.forEach((row) => {
+    output += row.join(" ") + "\n";
+  });
+
+  fallbackCopyToClipboard(output);
+
+  // 返回提取的数据
+  return tableData;
+}
+
 // 暴露函数给外部调用
+window.extract_guest_info = extract_guest_info;
 window.extractTextLabels = extractTextLabels;
