@@ -174,6 +174,28 @@ function extractTextLabels() {
     });
   });
 
+  // 寻找酒店明细元素，是一个div，而且它的index="酒店"
+  const hotel_details = document.querySelector("div[index='酒店']");
+
+  let hotel_room_map = {};
+
+  // 如果找到酒店明细元素，提取酒店房间信息
+  if (hotel_details) {
+    const type_card_mods = hotel_details.querySelectorAll("div.type_card_mod");
+    type_card_mods.forEach((type_card_mod) => {
+      const hotel_name = type_card_mod
+        .querySelector("div.price_text")
+        .textContent.trim();
+      const hotel_detail_mod = type_card_mod.querySelector(
+        "div.hotel_detail_mod"
+      );
+      const room_title = hotel_detail_mod
+        .querySelector("div.title")
+        .textContent.trim();
+      hotel_room_map[hotel_name] = room_title;
+    });
+  }
+
   // 处理 final_result 并生成输出字符串
   let output = "";
 
@@ -198,10 +220,15 @@ function extractTextLabels() {
       // 如果酒店名称不同，输出之前的酒店信息
       if (currentHotel) {
         if (currentStartDate === currentEndDate) {
-          output += `${currentStartDate} ${currentHotel}\n`;
+          output += `${currentStartDate} ${currentHotel}`;
         } else {
-          output += `${currentStartDate}-${currentEndDate} ${currentHotel}\n`;
+          output += `${currentStartDate}-${currentEndDate} ${currentHotel}`;
         }
+        // 添加房型信息
+        if (hotel_room_map[currentHotel]) {
+          output += ` (${hotel_room_map[currentHotel]})`;
+        }
+        output += "\n";
       }
       // 更新当前酒店信息
       currentHotel = hotel.内容;
@@ -211,10 +238,15 @@ function extractTextLabels() {
     // 输出最后一个酒店信息
     if (index === hotelInfo.length - 1) {
       if (currentStartDate === currentEndDate) {
-        output += `${currentStartDate} ${currentHotel}\n`;
+        output += `${currentStartDate} ${currentHotel}`;
       } else {
-        output += `${currentStartDate}-${currentEndDate} ${currentHotel}\n`;
+        output += `${currentStartDate}-${currentEndDate} ${currentHotel}`;
       }
+      // 添加房型信息
+      if (hotel_room_map[currentHotel]) {
+        output += ` (${hotel_room_map[currentHotel]})`;
+      }
+      output += "\n";
     }
   });
   output += "\n";
