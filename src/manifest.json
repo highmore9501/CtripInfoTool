@@ -11,7 +11,10 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://m.ctrip.com/webapp/vacations/dingzhi/journey*"],
+      "matches": [
+        "https://m.ctrip.com/webapp/vacations/dingzhi/journey*",
+        "https://vbooking.ctrip.com/micro/ttl_vbk/orderboard*"
+      ],
       "js": ["content.js"]
     }
   ],
