@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "定制行程信息提取器",
-  "version": "1.02",
-  "description": "提取携程定制方案中的关键信息。",
+  "version": "1.03",
+  "description": "提取携程定制方案中的关键信息以及客人信息",
   "author": "海口大河马",
   "homepage_url": "https://github.com/highmore9501",
   "permissions": ["scripting", "activeTab", "clipboardWrite"],
