@@ -181,18 +181,23 @@ function extractTextLabels() {
 
   // 如果找到酒店明细元素，提取酒店房间信息
   if (hotel_details) {
-    const type_card_mods = hotel_details.querySelectorAll("div.type_card_mod");
-    type_card_mods.forEach((type_card_mod) => {
-      const hotel_name = type_card_mod
+    const quotaion_card_mods = hotel_details.querySelectorAll(
+      "div.quotaion_card_mod"
+    );
+    quotaion_card_mods.forEach((quotaion_card_mod) => {
+      const hotel_name = quotaion_card_mod
         .querySelector("div.price_text")
         .textContent.trim();
-      const hotel_detail_mod = type_card_mod.querySelector(
+      const hotel_detail_mod = quotaion_card_mod.querySelector(
         "div.hotel_detail_mod"
       );
       const room_title = hotel_detail_mod
         .querySelector("div.title")
         .textContent.trim();
-      hotel_room_map[hotel_name] = room_title;
+      const price_num = quotaion_card_mod
+        .querySelector("span.price_num")
+        .textContent.trim();
+      hotel_room_map[hotel_name] = room_title + " " + price_num;
     });
   }
 
