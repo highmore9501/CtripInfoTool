@@ -396,6 +396,110 @@ function extract_guest_info() {
   return tableData;
 }
 
+function extract_airplane_info() {
+  // 使用属性选择器抓取所有id包含'flightTGQ'的元素
+  const airplane_elements = document.querySelectorAll("[id*='flightTGQ']");
+
+  if (airplane_elements.length === 0) {
+    console.error("未找到 id 包含 'flightTGQ' 的元素");
+    return;
+  }
+
+  const airplane_info_texts = [];
+  airplane_elements.forEach((element) => {
+    const text = element.textContent.trim();
+    if (text) {
+      const processAirplaneInfoResult = processAirplaneInfo(text);
+      airplane_info_texts.push(processAirplaneInfoResult);
+    }
+  });
+
+  let airplane_info_text = airplane_info_texts.join("\n");
+
+  const luggageInfoHover = document.querySelectorAll("[id*='luggageInfo']")[0];
+  if (luggageInfoHover) {
+    let luggageInfo = luggageInfoHover.textContent.trim();
+    airplane_info_text += "\n" + luggageInfo;
+  }
+  console.log("提取的飞机信息：", airplane_info_text);
+
+  fallbackCopyToClipboard(airplane_info_text);
+
+  return airplane_info_text;
+}
+
+function processAirplaneInfo(text) {
+  // 去掉多余的空格和制表符
+  text = text.replace(/\s+/g, " ").trim();
+  console.log("处理飞机信息：", text);
+
+  // 定义正则表达式来匹配日期和费用信息
+  const dateRegex = /\d{4}年\d{2}月\d{2}日\d{2}:\d{2}(前|后)/g;
+  const refundFeeRegex = /¥\d+\/人/g;
+  const changeFeeRegex = /¥\d+\/人/g;
+
+  // 提取所有日期
+  const dates = text.match(dateRegex);
+  console.log("dates", dates);
+
+  // 提取所有退订费和改期费
+  const refundFees = [];
+  const changeFees = [];
+  const refundFeeStartIndex = text.indexOf("套餐退订费");
+  const changeFeeStartIndex = text.indexOf("同舱改期费");
+  const changeFeeEndIndex = text.indexOf("签转条件");
+
+  if (
+    refundFeeStartIndex !== -1 &&
+    changeFeeStartIndex !== -1 &&
+    changeFeeEndIndex !== -1
+  ) {
+    const refundFeeText = text
+      .substring(refundFeeStartIndex, changeFeeStartIndex)
+      .replace("套餐退订费", "")
+      .trim();
+    const changeFeeText = text
+      .substring(changeFeeStartIndex, changeFeeEndIndex)
+      .replace("同舱改期费", "")
+      .trim();
+
+    refundFeeText
+      .match(refundFeeRegex)
+      .forEach((fee) => refundFees.push(`退订费${fee}`));
+    changeFeeText
+      .match(changeFeeRegex)
+      .forEach((fee) => changeFees.push(`改期费${fee}`));
+  }
+
+  console.log("refundFees", refundFees);
+  console.log("changeFees", changeFees);
+
+  // 检查是否提取到所有信息
+  if (
+    !dates ||
+    !refundFees ||
+    !changeFees ||
+    dates.length !== refundFees.length ||
+    dates.length !== changeFees.length
+  ) {
+    console.error("提取信息失败，请检查输入格式");
+    return;
+  }
+
+  // 生成输出字符串
+  let output = "";
+  for (let i = 0; i < dates.length; i++) {
+    const date = dates[i].replace("2025年", ""); // 去掉年份
+    const refundFee = refundFees[i];
+    const changeFee = changeFees[i];
+    output += `${date} ${refundFee} ${changeFee}\n`;
+  }
+  console.log("处理后的飞机信息：", output);
+
+  return output;
+}
+
 // 暴露函数给外部调用
 window.extract_guest_info = extract_guest_info;
 window.extractTextLabels = extractTextLabels;
+window.extract_airplane_info = extract_airplane_info;
