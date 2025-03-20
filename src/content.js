@@ -1,5 +1,194 @@
-// 定义提取文本标签的函数
 function extractTextLabels() {
+  if (window.location.hostname.includes("ctrip.com")) {
+    extractCtripTextLabels();
+  } else if (window.location.hostname.includes("qunar.com")) {
+    extractQunarTextLabels();
+  } else {
+    console.error("无法识别当前网页所属平台");
+  }
+}
+
+function extractQunarTextLabels() {
+  console.log("提取去哪儿行程信息...");
+  const qunar_activity_types = [
+    "住宿",
+    "餐饮",
+    "飞机",
+    "火车",
+    "汽车",
+    "用车",
+    "轮船",
+    "景点",
+    "购物",
+    "活动",
+  ];
+  const schedule_items = document.querySelectorAll("div.schedule-item");
+  schedule_items.forEach((item) => {
+    const schedule_day = item
+      .querySelector("div.schedule-day")
+      .textContent.trim();
+    const day_detail_items = item.querySelectorAll("div.day-detail-item");
+    day_detail_items.forEach((detail) => {
+      const day_detail_type = detail
+        .querySelector("div.day-detail-type")
+        .textContent.trim();
+      const detail_content = extractTextByActivityType(day_detail_type, detail);
+      console.log(`${schedule_day} ${day_detail_type} ${detail_content}`);
+    });
+  });
+
+  function extractTextByActivityType(activityType, day_detail_item) {
+    let activity_name = "";
+
+    if (activityType === "飞机") {
+      // 提取飞机信息
+      let arrCity = "";
+      const arrCity_element = day_detail_item.querySelector(
+        "input[placeholder='到达城市']"
+      );
+      if (arrCity_element) {
+        arrCity = arrCity_element.value;
+      }
+
+      let depCity = "";
+      const depCity_element = day_detail_item.querySelector(
+        "input[placeholder='出发城市']"
+      );
+      if (depCity_element) {
+        depCity = depCity_element.value;
+      }
+
+      let flightNo = "";
+      const flightNo_element = day_detail_item.querySelector(
+        "input[placeholder='航班号']"
+      );
+      if (flightNo_element) {
+        flightNo = flightNo_element.value;
+      }
+
+      let depTime = "";
+      const depTime_element = day_detail_item.querySelector(
+        "label[for='depTime']"
+      );
+      if (depTime_element) {
+        // 找到离 label 最近的 div class="el-form-item is-success is-required"
+        const parentDiv = depTime_element.closest(
+          "div.el-form-item.is-success.is-required"
+        );
+        if (parentDiv) {
+          // 在这个 div 下寻找 placeholder="选择时间" 的输入框
+          const depTime_input = parentDiv.querySelector(
+            "input[placeholder='选择时间']"
+          );
+          if (depTime_input) {
+            depTime = depTime_input.value; // 提取输入框的值
+          }
+        }
+      }
+
+      let arrTime = "";
+      const arrTime_element = day_detail_item.querySelector(
+        "label[for='arrTime']"
+      );
+      if (arrTime_element) {
+        // 找到离 label 最近的 div class="el-form-item is-success is-required"
+        const parentDiv = arrTime_element.closest(
+          "div.el-form-item.is-success.is-required"
+        );
+        if (parentDiv) {
+          // 在这个 div 下寻找 placeholder="选择时间" 的输入框
+          const arrTime_input = parentDiv.querySelector(
+            "input[placeholder='选择时间']"
+          );
+          if (arrTime_input) {
+            arrTime = arrTime_input.value; // 提取输入框的值
+          }
+        }
+      }
+
+      activity_name = `${flightNo} ${depCity}-${arrCity} ${depTime}-${arrTime} `;
+    } else if (activityType === "住宿") {
+      // 提取住宿信息
+      const activity_name_element = day_detail_item.querySelector(
+        "input[placeholder='请输入酒店名称']"
+      );
+      if (activity_name_element) {
+        activity_name = activity_name_element.value;
+      }
+    } else if (activityType === "景点") {
+      // 提取景点信息
+      const activity_name_element = day_detail_item.querySelector(
+        "input[placeholder='请输入景点名称']"
+      );
+      if (activity_name_element) {
+        const fullName = activity_name_element.value;
+        // 按 '.' 分割并提取最后一部分
+        activity_name = fullName.split(".").pop().trim();
+      }
+    } else if (activityType === "用车") {
+      // 提取用车信息，获取所有单选框的 input 元素
+      const radioInputs = day_detail_item.querySelectorAll(
+        "input.el-radio__original"
+      );
+
+      // 遍历找到当前选中的单选框
+      let useCarType = "";
+      // 遍历找到当前选中的单选框
+      radioInputs.forEach((input) => {
+        if (input.checked) {
+          // 获取选中单选框对应的文本值
+          const labelElement = input
+            .closest(".el-radio")
+            .querySelector(".el-radio__label");
+          if (labelElement) {
+            useCarType = labelElement.textContent.trim(); // 提取文本内容
+          }
+        }
+      });
+
+      let useCarHour = "";
+      const hour_element = day_detail_item.querySelector(
+        "input[placeholder='0~24之间的整数']"
+      );
+      if (hour_element) {
+        useCarHour = hour_element.value;
+      }
+
+      let useCarMinute = "";
+      const minute_element = day_detail_item.querySelector(
+        "input[placeholder='0~60之间的整数']"
+      );
+      if (minute_element) {
+        useCarMinute = minute_element.value;
+      }
+
+      activity_name = `${useCarType} ${useCarHour}小时${useCarMinute}分钟`; // 拼接用车信息
+    } else if (activityType === "餐饮") {
+      // 提取餐饮信息
+    } else if (activityType === "购物") {
+      // 提取购物信息
+    } else if (activityType === "活动") {
+      const activity_name_element = day_detail_item.querySelector(
+        "input[placeholder='请输入活动名称']"
+      );
+      if (activity_name_element) {
+        activity_name = activity_name_element.value;
+      }
+      // 提取活动信息
+    } else if (activityType === "火车") {
+      // 提取火车信息
+    } else if (activityType === "汽车") {
+      // 提取汽车信息
+    } else if (activityType === "轮船") {
+      // 提取轮船信息
+    }
+
+    return activity_name;
+  }
+}
+
+// 定义提取文本标签的函数
+function extractCtripTextLabels() {
   const tourActivityTypes = [
     "特色体验",
     "美食美酒",
