@@ -640,22 +640,28 @@ function qunar_airplane_info() {
   });
 
   const refund_cont = document.querySelector("div.refund-cont.refund-open");
-  const tgq_table_container = refund_cont.querySelector(
-    "div.tgq-table-container"
-  );
-  const tgq_items = tgq_table_container.querySelectorAll("div.tgq-item");
-  tgq_items.forEach((tgq_item) => {
-    const tgq_title = tgq_item.querySelector("h3.tgq-title").textContent.trim();
-    if (tgq_title == "成人退改签说明") {
-      const tgq_tbody = tgq_item.querySelector("tbody");
-      const liElements = tgq_tbody.querySelectorAll("li"); // 获取所有的 <li> 标签
-      const liTexts = Array.from(liElements).map((li) => li.textContent.trim()); // 提取文本并去除多余空格
+  if (refund_cont) {
+    const tgq_table_container = refund_cont.querySelector(
+      "div.tgq-table-container"
+    );
+    const tgq_items = tgq_table_container.querySelectorAll("div.tgq-item");
+    tgq_items.forEach((tgq_item) => {
+      const tgq_title = tgq_item
+        .querySelector("h3.tgq-title")
+        .textContent.trim();
+      if (tgq_title == "成人退改签说明") {
+        const tgq_tbody = tgq_item.querySelector("tbody");
+        const liElements = tgq_tbody.querySelectorAll("li"); // 获取所有的 <li> 标签
+        const liTexts = Array.from(liElements).map((li) =>
+          li.textContent.trim()
+        ); // 提取文本并去除多余空格
 
-      const result = liTexts.join("\n"); // 用 \n 分隔
-      console.log(result);
-      final_result += result + "\n";
-    }
-  });
+        const result = liTexts.join("\n"); // 用 \n 分隔
+        console.log(result);
+        final_result += result + "\n";
+      }
+    });
+  }
 
   fallbackCopyToClipboard(final_result);
 }

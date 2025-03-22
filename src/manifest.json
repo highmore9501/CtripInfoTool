@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "定制行程信息提取器",
-  "version": "1.04",
+  "version": "1.1",
   "description": "帮定制师提取各种网页上的信息",
   "author": "海口大河马",
   "homepage_url": "https://github.com/highmore9501",
@@ -13,7 +13,9 @@
     {
       "matches": [
         "https://m.ctrip.com/webapp/vacations/dingzhi/journey*",
-        "https://vbooking.ctrip.com/micro/ttl_vbk/orderboard*"
+        "https://vbooking.ctrip.com/micro/ttl_vbk/orderboard*",
+        "https://diy.dujia.qunar.com/supplier#/admin/itinerary/basicinfo/edit.qunar*",
+        "https://qnf.trade.qunar.com/ns/book/fill*"
       ],
       "js": ["content.js"]
     }
