@@ -521,6 +521,16 @@ function fallbackCopyToClipboard(text) {
 }
 
 function extract_guest_info() {
+  if (window.location.hostname.includes("ctrip.com")) {
+    extract_ctrip_guest_info();
+  } else if (window.location.hostname.includes("qunar.com")) {
+    extract_qunar_guest_info();
+  } else {
+    console.error("无法识别当前网页所属平台");
+  }
+}
+
+function extract_ctrip_guest_info() {
   // 1. 在当前页面中寻找class为`ant-table-tbody`的所有div
   const cardBodys = document.querySelectorAll("div.ant-card-body");
   // 使用最后一个cardBody
@@ -575,6 +585,44 @@ function extract_guest_info() {
 
   // 返回提取的数据
   return tableData;
+}
+
+function extract_qunar_guest_info() {
+  const guestInfo = [];
+  const PassengerInfoBody = document.querySelector("#PassengerInfo");
+
+  // 查找所有包含客人信息的元素
+  const guestElements = PassengerInfoBody.querySelectorAll(
+    ".m-grid-items.m-traveller-item"
+  );
+
+  guestElements.forEach((guest) => {
+    const name = guest
+      .querySelectorAll("div")[1]
+      .querySelector("span:nth-child(2)")
+      ?.textContent.trim();
+    const idNumber = guest
+      .querySelectorAll("div")[7]
+      .querySelector("span:nth-child(2)")
+      ?.textContent.replace("解密", "")
+      .trim();
+
+    if (name && idNumber) {
+      guestInfo.push({ name, idNumber });
+    }
+  });
+
+  console.log("提取的客人信息：", guestInfo);
+
+  let output = "";
+  guestInfo.forEach((guest) => {
+    output += `${guest.name} ${guest.idNumber}\n`;
+  });
+
+  fallbackCopyToClipboard(output);
+
+  // 返回提取的数据
+  return guestInfo;
 }
 
 function extract_airplane_info() {
