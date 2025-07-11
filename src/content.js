@@ -625,6 +625,226 @@ function extract_qunar_guest_info() {
   return guestInfo;
 }
 
+function extract_order_info() {
+  if (window.location.hostname.includes("ctrip.com")) {
+    extract_ctrip_order_info();
+  } else if (window.location.hostname.includes("qunar.com")) {
+    extract_qunar_order_info();
+  } else {
+    console.error("无法识别当前网页所属平台");
+  }
+}
+
+function extract_ctrip_order_info() {
+  const orderInfoElement = document.querySelector("#BasicInfo");
+  if (!orderInfoElement) {
+    console.error("未找到携程客人需求信息模块");
+    return null;
+  }
+
+  const orderInfo = {};
+
+  // 提取联系人信息
+  const contactElement = Array.from(orderInfoElement.querySelectorAll(".label"))
+    .find((label) => label.textContent.trim() === "联系人")
+    ?.nextElementSibling?.querySelector("span");
+
+  orderInfo.contact = contactElement
+    ? contactElement.textContent.trim()
+    : "未填写";
+
+  // 提取出发/目的地
+  const destinationElement = Array.from(
+    orderInfoElement.querySelectorAll(".label")
+  )
+    .find((label) => label.textContent.trim() === "出发/目的地")
+    ?.parentElement.querySelector(".content span");
+  orderInfo.destination = destinationElement
+    ? destinationElement.textContent.trim()
+    : "未填写";
+
+  // 提取推荐景点信息
+  const recommendedAttractionsElement = Array.from(
+    orderInfoElement.querySelectorAll(".label")
+  )
+    .find((label) => label.textContent.trim() === "推荐景点信息")
+    ?.parentElement.querySelector(".content span");
+  orderInfo.recommendedAttractions = recommendedAttractionsElement
+    ? recommendedAttractionsElement.textContent.trim()
+    : "未填写";
+
+  // 提取人均预算
+  const budgetElement = Array.from(orderInfoElement.querySelectorAll(".label"))
+    .find((label) => label.textContent.trim() === "人均预算")
+    ?.parentElement.querySelector(".content span");
+  orderInfo.budget = budgetElement
+    ? budgetElement.textContent.trim()
+    : "未填写";
+
+  // 提取用户备注
+  const userRemarkElement = Array.from(
+    orderInfoElement.querySelectorAll(".label")
+  )
+    .find((label) => label.textContent.trim() === "用户备注")
+    ?.parentElement.querySelector(".content span");
+  orderInfo.userRemark = userRemarkElement
+    ? userRemarkElement.textContent.trim()
+    : "未填写";
+
+  // 提取所需服务
+  const requiredServiceElement = Array.from(
+    orderInfoElement.querySelectorAll(".label")
+  )
+    .find((label) => label.textContent.trim() === "所需服务")
+    ?.parentElement.querySelector(".content span");
+  orderInfo.requiredService = requiredServiceElement
+    ? requiredServiceElement.textContent.trim()
+    : "未填写";
+
+  // 提取酒店星级
+  const hotelStarElement = Array.from(
+    orderInfoElement.querySelectorAll(".label")
+  )
+    .find((label) => label.textContent.trim() === "酒店星级")
+    ?.parentElement.querySelector(".content span");
+  orderInfo.hotelStar = hotelStarElement
+    ? hotelStarElement.textContent.trim()
+    : "未填写";
+
+  // 提取联系方式
+  const contactInfoElement = Array.from(
+    orderInfoElement.querySelectorAll(".label")
+  )
+    .find((label) => label.textContent.trim() === "联系方式")
+    ?.nextElementSibling?.querySelector("span");
+  orderInfo.contactInfo = contactInfoElement
+    ? contactInfoElement.textContent.trim()
+    : "未填写";
+
+  // 提取出行人数
+  const travelPeopleElement = Array.from(
+    orderInfoElement.querySelectorAll(".label")
+  )
+    .find((label) => label.textContent.trim() === "出行人数")
+    ?.nextElementSibling?.querySelector("span");
+  orderInfo.travelPeople = travelPeopleElement
+    ? travelPeopleElement.textContent.trim()
+    : "未填写";
+
+  // 提取订单渠道
+  const orderChannelElement = Array.from(
+    orderInfoElement.querySelectorAll(".label")
+  )
+    .find((label) => label.textContent.trim() === "订单渠道")
+    ?.nextElementSibling?.querySelector("span");
+  orderInfo.orderChannel = orderChannelElement
+    ? orderChannelElement.textContent.trim()
+    : "未填写";
+
+  // 提取订单来源
+  const orderSourceElement = Array.from(
+    orderInfoElement.querySelectorAll(".label")
+  )
+    .find((label) => label.textContent.trim() === "订单来源")
+    ?.nextElementSibling?.querySelector("span");
+  orderInfo.orderSource = orderSourceElement
+    ? orderSourceElement.textContent.trim()
+    : "未填写";
+
+  // 提取订单号
+  const orderIdElement = document.querySelector(".order-id");
+  orderInfo.orderId = orderIdElement
+    ? orderIdElement.textContent.match(/单号：(\d+)/)?.[1] || "未填写"
+    : "未填写";
+
+  // 提取定制类型（所有标签）
+  const tagElements = orderIdElement.querySelectorAll(".ant-tag");
+  orderInfo.customizationType = Array.from(tagElements)
+    .map((tag) => tag.textContent.trim())
+    .join(" ");
+
+  console.log("提取的订单信息：", orderInfo);
+
+  // 拼接输出文本
+  let output = `订单号: ${orderInfo.orderId}\n`;
+  output += `联系人: ${orderInfo.contact}\n`;
+  output += `联系方式: ${orderInfo.contactInfo}\n`;
+  output += `出发/目的地: ${orderInfo.destination}\n`;
+  output += `推荐景点信息： ${orderInfo.recommendedAttractions}\n`;
+  output += `人均预算: ${orderInfo.budget}\n`;
+  output += `所需服务: ${orderInfo.requiredService}\n`;
+  output += `酒店星级: ${orderInfo.hotelStar}\n`;
+  output += `用户备注：${orderInfo.userRemark}\n`;
+  output += `出行人数: ${orderInfo.travelPeople}\n`;
+  output += `订单渠道: ${orderInfo.orderChannel}\n`;
+  output += `订单来源: ${orderInfo.orderSource}\n`;
+  output += `定制类型: ${orderInfo.customizationType}\n`;
+
+  // 调用复制到剪贴板的方法
+  fallbackCopyToClipboard(output);
+
+  // 返回提取的数据
+  return orderInfo;
+}
+
+function extract_qunar_order_info() {
+  const orderInfo = {};
+  // 提取订单号（从第一个span元素）
+  const orderBaseInfoElement = document.querySelector(".m-baseinfo");
+  const orderNumberSpan =
+    orderBaseInfoElement.querySelector(".m-sub-title span");
+  orderInfo.orderNumber = orderNumberSpan
+    ? orderNumberSpan.textContent.replace("订单号：", "")
+    : "未找到订单号";
+
+  // 提取所有可见标签
+  const tags = [];
+  const tagSpans = orderBaseInfoElement.querySelectorAll(".tag-list .cube");
+
+  tagSpans.forEach((span) => {
+    // 检查元素是否可见（无display:none样式）
+    const isVisible = !span.style.display || span.style.display !== "none";
+
+    if (isVisible) {
+      const tagText = span.textContent.trim();
+      // 只添加非空标签
+      if (tagText) tags.push(tagText);
+    }
+  });
+
+  // 拼接标签文本
+  orderInfo.tagsText = tags.join(" ");
+
+  const userNeedContainerElement = document.querySelector(
+    ".m-userneeds-container"
+  );
+  if (userNeedContainerElement) {
+    const userNeedElement =
+      userNeedContainerElement.querySelector(".module-flex");
+    const needsItems = userNeedElement.querySelectorAll(".item");
+    const userNeeds = [];
+    needsItems.forEach((item) => {
+      const itemText = item.textContent.trim();
+      if (itemText) {
+        userNeeds.push(itemText);
+      }
+    });
+    orderInfo.userNeed = userNeeds.join("\n");
+  }
+
+  console.log("提取的订单信息：", orderInfo);
+
+  // 拼接输出文本
+  let output = `订单号: ${orderInfo.orderNumber}\n`;
+  output += `定制类型: ${orderInfo.tagsText}\n`;
+  output += `${orderInfo.userNeed || "未填写"}\n`;
+
+  // 调用复制到剪贴板的方法
+  fallbackCopyToClipboard(output);
+
+  return orderInfo;
+}
+
 function extract_airplane_info() {
   if (window.location.hostname.includes("ctrip.com")) {
     return ctrip_airplane_info();

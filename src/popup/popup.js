@@ -58,6 +58,36 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  const extractOrderInfoButton = document.getElementById(
+    "extract-order-info-button"
+  );
+
+  extractOrderInfoButton.addEventListener("click", function () {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      // 注入 content.js 并执行 extract_order_info 函数
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tabs[0].id },
+          files: ["content.js"], // 注入 content.js
+        },
+        () => {
+          // 在 content.js 注入完成后，调用 extract_order_info
+          chrome.scripting.executeScript({
+            target: { tabId: tabs[0].id },
+            func: () => {
+              // 调用 content.js 中的 extract_order_info 函数
+              if (typeof window.extract_order_info === "function") {
+                return window.extract_order_info();
+              } else {
+                throw new Error("extract_order_info 函数未定义");
+              }
+            },
+          });
+        }
+      );
+    });
+  });
+
   const extractAirplaneInfoButton = document.getElementById(
     "extract-airplane-info-button"
   );
